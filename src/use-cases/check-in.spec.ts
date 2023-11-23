@@ -1,4 +1,4 @@
-import { expect, it, describe, beforeEach } from 'vitest'
+import { expect, it, describe, beforeEach, vi, afterEach } from 'vitest'
 import { InMemoryCheckInsRepositories } from '@/repositories/in-memory/in-memory-check-ins-repository copy'
 import { CheckInUsecase } from './checkin'
 import { randomUUID } from 'node:crypto'
@@ -10,6 +10,12 @@ describe('Check-in use case', () => {
   beforeEach(() => {
     checkInsRepository = new InMemoryCheckInsRepositories()
     sut = new CheckInUsecase(checkInsRepository)
+
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it('should be able to check in', async () => {
@@ -22,6 +28,8 @@ describe('Check-in use case', () => {
   })
 
   it('should be able to check in twice in the same day', async () => {
+    vi.setSystemTime(new Date(2023, 0, 20, 8, 0, 0))
+
     await sut.execute({
       gymId: randomUUID(),
       userId: randomUUID(),
